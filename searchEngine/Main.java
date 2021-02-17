@@ -16,10 +16,34 @@ public class Main {
 		Index index = new Index();
 
 		ArrayList<TreeMap<Integer, Double>> listeIdFrequences = new ArrayList<TreeMap<Integer, Double>>();
+		ArrayList<String> listeOperateurs = new ArrayList<String>();
+		
 		for(int i = 0; i < tabQuery.length; i++) {
 			if(i %2 == 0) { // Si i est pair alors tabQuery[i] est un mot
 				Keyword k = index.getKeyword(tabQuery[i]);
 				listeIdFrequences.add(k.getFrequences());
+			}
+			else {
+				listeOperateurs.add(tabQuery[i]);
+			}
+		}
+		
+		//traitement operateur
+		
+		for(int j = 0; j < listeOperateurs.size(); j++) {
+			switch(listeOperateurs.get(j)) {
+			
+			case "and":
+				//traitement
+				break;
+				
+			case "or":
+				//traitement
+				break;
+				
+			default:
+				//traitement
+				break;
 			}
 		}
 		
