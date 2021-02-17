@@ -32,7 +32,7 @@ public class Main {
 		
 		for(int j = 0; j < listeOperateurs.size(); j++) {
 			switch(listeOperateurs.get(j)) {
-			
+			//listeIdFrequences correspondant = indice j et indice j+1
 			case "and":
 				//traitement
 				break;
