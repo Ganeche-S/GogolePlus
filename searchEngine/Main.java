@@ -12,8 +12,8 @@ public class Main {
 		String query = saisie.nextLine();
 		String[]tabQuery = query.split(" ");
 		
-		Index.loadVocabulary();
 		Index index = new Index();
+		index.loadVocabulary();
 
 		ArrayList<TreeMap<Integer, Double>> listeIdFrequences = new ArrayList<TreeMap<Integer, Double>>();
 		ArrayList<String> listeOperateurs = new ArrayList<String>();
