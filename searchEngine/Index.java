@@ -1,6 +1,9 @@
 package searchEngine;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 import java.util.TreeMap;
 
 
@@ -139,6 +142,30 @@ public class Index {
 			System.exit(1);
 		}
 		return null;
+	}
+	
+	public static ArrayList<String> creerListeMot(String query) throws FileNotFoundException{
+		Scanner StopWordScan;
+		String[] strings = query.split(" ");
+		ArrayList<String> ToReturn = new ArrayList<String>();
+		File f = new File("stopwords.txt");
+		
+		for(String s : strings) {
+			boolean found = false;
+			StopWordScan = new Scanner(f);
+			while(StopWordScan.hasNextLine()) {
+				System.out.println(StopWordScan.nextLine());
+				
+//				if(s.equals(StopWordScan.next())) {
+//					found = true;
+//				}
+				System.out.println(found);
+			}
+			if(!found) ToReturn.add(s);
+		}
+		
+		return ToReturn;
+		
 	}
 
 
