@@ -1,10 +1,11 @@
 package searchEngine;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 import java.util.TreeMap;
 
 public class Main {
+	
 
 	public static void main(String[] args) {
 		Scanner saisie = new Scanner(System.in);
@@ -15,55 +16,71 @@ public class Main {
 		Index index = new Index();
 		index.loadVocabulary();
 
-		ArrayList<TreeMap<Integer, Double>> listeIdFrequences = new ArrayList<TreeMap<Integer, Double>>();
-		ArrayList<String> listeOperateurs = new ArrayList<String>();
+		//ArrayList<TreeMap<Integer, Double>> listeIdFrequences = new ArrayList<TreeMap<Integer, Double>>();
+        //ArrayList<String> listeOperateurs = new ArrayList<String>();
+        HashMap<Integer,Double> resultat = new HashMap<Integer,Double>();
+        Keyword k1 = null;
+        for(int i = 0; i < tabQuery.length; i++) {
+            if(i %2 == 0) { // Si i est pair alors tabQuery[i] est un mot
+                k1 = index.getKeyword(tabQuery[i]);
+//                if(k1 != null) {
+//                    //listeIdFrequences.add(k.getFrequences());
+//                }
+            }
+            else {
+            	Keyword k2;
+            	TreeMap<Integer,Double> freq1;
+                TreeMap<Integer,Double> freq2;
+                k2 = index.getKeyword(tabQuery[i+1]);
+                freq1 = k1.getFrequences();
+                freq2 = k2.getFrequences();
+                 switch(tabQuery[i]) {
+                 	
+	                 case "and":
+	                    //traitement
+	                   
+	                    for(Integer idDoc : freq1.keySet()) {
+	                        if (freq2.containsKey(idDoc)){
+	                        	if (freq1.get(idDoc)>freq2.get(idDoc)){
+	                        		resultat.put(idDoc,freq2.get(idDoc));
+	                            }
+	                        	else{
+	                        		resultat.put(idDoc,freq1.get(idDoc));
+	                            }
+	
+	                        }
+	                    }
+	                    break;
+	                    
+	                 case "or":
+	                	 
+		                 for(Integer idDoc : freq1.keySet()) {
+		                     if (freq2.containsKey(idDoc)){
+		                    	 if (freq1.get(idDoc)<freq2.get(idDoc)){
+		                    		 resultat.put(idDoc,freq2.get(idDoc));
+		                         }
+		                         else{
+		                        	resultat.put(idDoc,freq1.get(idDoc));
+		                         }
 		
-		for(int i = 0; i < tabQuery.length; i++) {
-			if(i %2 == 0) { // Si i est pair alors tabQuery[i] est un mot
-				Keyword k = index.getKeyword(tabQuery[i]);
-				if(k != null) {
-					listeIdFrequences.add(k.getFrequences());
-				}
-			}
-			else {
-				listeOperateurs.add(tabQuery[i]);
-			}
-		}
-		
-		//traitement operateur
-		
-		for(int j = 0; j < listeOperateurs.size(); j++) {
-			switch(listeOperateurs.get(j)) {
-			//listeIdFrequences correspondant = indice j et indice j+1
-			case "and":
-				//traitement
-				break;
-				
-			case "or":
-				//traitement
-				break;
-				
-			default:
-				//traitement
-				break;
-			}
-		}
+		                        }
+		                    }
+		                    break;
+		                    
+	                 case "not":
+	                	 for(Integer idDoc : freq1.keySet()) {
+	                		 if (!freq2.containsKey(idDoc)){
+	                			 resultat.put(idDoc, freq1.get(idDoc));
+	                		 }
+	                	 }
+	                	 
+                 
+                  }
+                 
 		
 		
-//		ArrayList<String> queryCleared;
-//		try {
-//			queryCleared = Index.creerListeMot(query);
-//		
-//			for(String s: queryCleared) {
-//				System.out.println(s);
-//			}
-//		}
-//		catch (FileNotFoundException e) {
-//			e.getMessage();
-//		}
-		
-		
-		
+            }
+        }
+        saisie.close();
 	}
-
 }
