@@ -21,7 +21,9 @@ public class Main {
 		for(int i = 0; i < tabQuery.length; i++) {
 			if(i %2 == 0) { // Si i est pair alors tabQuery[i] est un mot
 				Keyword k = index.getKeyword(tabQuery[i]);
-				listeIdFrequences.add(k.getFrequences());
+				if(k != null) {
+					listeIdFrequences.add(k.getFrequences());
+				}
 			}
 			else {
 				listeOperateurs.add(tabQuery[i]);
