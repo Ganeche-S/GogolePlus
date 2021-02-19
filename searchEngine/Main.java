@@ -13,6 +13,16 @@ public class Main {
 	
 
 	public static void main(String[] args) {
+		//booleanEngine();
+		
+	}
+	
+	public static void vectorialEngine() {
+		
+	}
+	
+	
+	public static void booleanEngine() {
 		Scanner saisie = new Scanner(System.in);
 		System.out.println("Que souhaitez-vous rechercher ?");
 		String query = saisie.nextLine();
@@ -133,6 +143,7 @@ public class Main {
         }
         saisie.close();
 	}
+	
 	
 	public void clearQuery(ArrayList<String> listQuery) {
 		BufferedReader reader;
