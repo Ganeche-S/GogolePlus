@@ -42,7 +42,6 @@ public class Main {
 		
 		HashMap<Integer,Double> resultat = new HashMap<Integer,Double>();
         Keyword k1 = index.getKeyword(listQuery.get(0));
-        TreeMap<Integer,Double> freq1 = k1.getFrequences();
         System.out.println("taille de résultat = " + resultat.size());
 
         for(int i = 0; i < listQuery.size(); i++) {
@@ -51,7 +50,8 @@ public class Main {
 //            freq1 = k1.getFrequences();
         	
                 
-            if(i == 0) {
+            if(i == 0 && (k1 != null)) {
+                TreeMap<Integer,Double> freq1 = k1.getFrequences();
             	for(Integer id : freq1.keySet()) {
                     resultat.put(id, freq1.get(id));
                 }
@@ -59,23 +59,29 @@ public class Main {
                 
             Keyword k2;
             TreeMap<Integer,Double> freq2;
+            
             k2 = index.getKeyword(listQuery.get(i));
             
-           
-            
-            
-            freq2 = k2.getFrequences();
-            
-            System.out.println("taille freq2 = " + freq2.size());
-            HashMap<Integer,Double> resultatTmp = new HashMap<Integer,Double>();
-            
-            for(Integer idDoc : freq2.keySet()) {
-            	resultat.put(idDoc, freq2.get(idDoc));
-            }
+           if(k2 != null) {
+
+               freq2 = k2.getFrequences();
                
+               System.out.println("taille freq2 = " + freq2.size());
+               HashMap<Integer,Double> resultatTmp = new HashMap<Integer,Double>();
+               
+               for(Integer idDoc : freq2.keySet()) {
+               	resultat.put(idDoc, freq2.get(idDoc));
+               }
                   
-            //resultat = resultatTmp;
-            System.out.println("nouvelle taille resultat = " + resultat.size());
+                     
+               //resultat = resultatTmp;
+               System.out.println("nouvelle taille resultat = " + resultat.size());
+           }
+           else {
+        	   System.out.println("mot introuvable");
+           }
+            
+            
 
         }
        
