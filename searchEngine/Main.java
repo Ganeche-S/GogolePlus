@@ -14,12 +14,80 @@ public class Main {
 
 	public static void main(String[] args) {
 		//booleanEngine();
+		vectorialEngine();
 		
 	}
 	
 	public static void vectorialEngine() {
+		Scanner saisie = new Scanner(System.in);
+		System.out.println("Que souhaitez-vous rechercher ?");
+		String query = saisie.nextLine();
+		String[]tabQuery = query.split(" ");
 		
+		//initializing the list
+		
+		ArrayList<String>listQuery = new ArrayList<String>();
+		for(String s : tabQuery) {
+			listQuery.add(s);
+		}
+		
+		//removing all stopWords
+		
+		clearQuery(listQuery);
+		
+		
+		Index index = new Index();
+		index.loadVocabulary();
+		index.loadDocuments();
+		
+		HashMap<Integer,Double> resultat = new HashMap<Integer,Double>();
+        Keyword k1 = index.getKeyword(listQuery.get(0));
+        TreeMap<Integer,Double> freq1 = k1.getFrequences();
+        System.out.println("taille de résultat = " + resultat.size());
+
+        for(int i = 0; i < listQuery.size(); i++) {
+//            k1 = index.getKeyword(listQuery.get(i));
+//            TreeMap<Integer,Double> freq1;
+//            freq1 = k1.getFrequences();
+        	
+                
+            if(i == 0) {
+            	for(Integer id : freq1.keySet()) {
+                    resultat.put(id, freq1.get(id));
+                }
+            }
+                
+            Keyword k2;
+            TreeMap<Integer,Double> freq2;
+            k2 = index.getKeyword(listQuery.get(i));
+            
+           
+            
+            
+            freq2 = k2.getFrequences();
+            
+            System.out.println("taille freq2 = " + freq2.size());
+            HashMap<Integer,Double> resultatTmp = new HashMap<Integer,Double>();
+            
+            for(Integer idDoc : freq2.keySet()) {
+            	resultat.put(idDoc, freq2.get(idDoc));
+            }
+               
+                  
+            //resultat = resultatTmp;
+            System.out.println("nouvelle taille resultat = " + resultat.size());
+
+        }
+       
+            	
+            
+        
 	}
+	
+	
+	
+	// ------------------------------------------------------------------------------------------------------------
+	
 	
 	
 	public static void booleanEngine() {
@@ -145,14 +213,16 @@ public class Main {
 	}
 	
 	
-	public void clearQuery(ArrayList<String> listQuery) {
+	public static void clearQuery(ArrayList<String> listQuery) {
 		BufferedReader reader;
+
 		try {
-			reader = new BufferedReader(new FileReader("/Gogole/searchEngine/stopwords.txt"));
+			reader = new BufferedReader(new FileReader("stopwords.txt"));
 			String ligneLue = reader.readLine();
 			while (ligneLue != null) {
 				for(int indice = 0; indice < listQuery.size(); indice++) {
-					if(indice %2 == 0 && listQuery.get(indice) == ligneLue) {
+					
+					if(listQuery.get(indice).equals(ligneLue)) {
 						listQuery.remove(indice);
 					}
 				}
