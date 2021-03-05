@@ -8,6 +8,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map.Entry;
 import java.util.Scanner;
 import java.util.TreeMap;
 
@@ -16,8 +20,8 @@ public class Main {
 
 	public static void main(String[] args) {
 		//booleanEngine();
-		//vectorialEngine(); 
-		probabilisticEngine();
+		vectorialEngine(); 
+		//probabilisticEngine();
 	}
 	
 
@@ -77,8 +81,8 @@ public class Main {
 
        }
 
-        ajoutParPertinence(index, resultat, listQuery, 0.99);
-        //vectorialEngine(listQuery);	//penser à retirer le commentaire après les tests
+        ajoutParPertinence(index, resultat, listQuery);
+        vectorialEngine(listQuery);	//penser à retirer le commentaire après les tests
         
 	}
 	
@@ -390,7 +394,7 @@ public class Main {
 		return associationDocumentsPoids;
 	}
 	
-	public static void ajoutParPertinence(Index index, HashMap<Integer,Double> resultat, ArrayList<String>listQuery, double seuil) {
+	public static void ajoutParPertinence(Index index, HashMap<Integer,Double> resultat, ArrayList<String>listQuery) {
 		double N = index.documents.size();
 		double R = resultat.size();
 		
@@ -398,17 +402,29 @@ public class Main {
 //		System.out.println("taille de R = " + R);
 		
 		
+		HashSet<String> mots = new HashSet<String>();
+		HashMap<String, Double> associationMotPertinance = new HashMap<String, Double>();
 		
 		for(Integer idDoc : resultat.keySet()) {
 			Document doc = index.getDocument(idDoc);
 			
+			
 			for(String mot : doc.getFrequences().keySet()) {
-				double n = (double)index.getKeyword(mot).getFrequences().keySet().size();
+				if(!mots.contains(mot)) mots.add(mot);
+				
+			}
+		}
+		
+		for(String mot : mots) {
+			if(!listQuery.contains(mot)) {
+				TreeMap<Integer, Double> associationIdFreq = index.getKeyword(mot).getFrequences();
+ 				double n = (double)associationIdFreq.keySet().size();
 				double r = 0;
 				
-				for(Integer id : resultat.keySet()) {
-					Document doc2 = index.getDocument(id);
-					if(doc2.getFrequences().containsKey(mot)) {
+				
+				
+				for(Integer id : associationIdFreq.keySet()) {
+					if(resultat.containsKey(id)) {
 						r++;
 					}
 				}
@@ -419,18 +435,82 @@ public class Main {
 				double valPertinence = Math.log10((r/(R-r))/((n-r)/(N-n-R+r))) * Math.abs((r-R)-(n-r)/(N-R));
 				
 				
-				if(valPertinence >= seuil) {
-					System.out.println("Nouveau mot ajouté: " + mot);
-					System.out.println("Valeur de N = " + N);
-					System.out.println("Valeur de n = " + n);
-					System.out.println("Valeur de R = " + R);
-					System.out.println("Valeur de r = " + r);
-					System.out.println("Valeur de pertinence = " + valPertinence + "\n\n");
-					listQuery.add(mot);
+//				if(valPertinence >= seuil) {
+//					System.out.println("Nouveau mot ajouté: " + mot);
+//					System.out.println("Valeur de N = " + N);
+//					System.out.println("Valeur de n = " + n);
+//					System.out.println("Valeur de R = " + R);
+//					System.out.println("Valeur de r = " + r);
+//					System.out.println("Valeur de pertinence = " + valPertinence + "\n\n");
+//					listQuery.add(mot);
+//				}
+				
+//					if(nouveauMot == null) {
+//						nouveauMot = mot;
+//						pertinanceNouveauMot = valPertinence;
+//					}
+//					else {
+//						if(valPertinence > pertinanceNouveauMot) {
+//							nouveauMot = mot;
+//							pertinanceNouveauMot = valPertinence;
+//						}
+//					}
+				if(valPertinence != Double.POSITIVE_INFINITY) {
+					associationMotPertinance.put(mot, valPertinence);
+					System.out.println("mot = " + mot + " val = " + valPertinence);
 				}
+				
 			}
-		}
+			
+				}
+				
+//			HashMap<String, Double> mapTriee = sortHashMapByValues(associationMotPertinance);
+//			String nouveauMot = (String) mapTriee.keySet().toArray()[0];
+
+				Entry<String, Double> maxEntry = null;
+
+				for (Entry<String, Double> entry : associationMotPertinance.entrySet()) {
+				
+				    if (maxEntry == null || entry.getValue().compareTo(maxEntry.getValue()) > 0) {
+				    
+				        maxEntry = entry;
+				    }
+				}
+				System.out.println(maxEntry.getKey());
+				listQuery.add(maxEntry.getKey());
+		
+
 	}
+	
+	public static HashMap<String, Double> sortHashMapByValues(HashMap<String, Double> passedMap) {
+		
+	    List<String> mapKeys = new ArrayList<>(passedMap.keySet());
+	    List<Double> mapValues = new ArrayList<>(passedMap.values());
+	    Collections.sort(mapValues);
+	    Collections.sort(mapKeys);
+
+	    HashMap<String, Double> sortedMap = new HashMap<>();
+
+	    Iterator<Double> valueIt = mapValues.iterator();
+	    while (valueIt.hasNext()) {
+	        double val = valueIt.next();
+	        Iterator<String> keyIt = mapKeys.iterator();
+
+	        while (keyIt.hasNext()) {
+	            String key = keyIt.next();
+	            double comp1 = passedMap.get(key);
+	            double comp2 = val;
+
+	            if (comp1 == comp2) {
+	                keyIt.remove();
+	                sortedMap.put(key, val);
+	                break;
+	            }
+	        }
+	    }
+	    return sortedMap;
+	}
+
 
 	
 }
