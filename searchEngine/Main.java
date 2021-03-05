@@ -5,6 +5,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Scanner;
 import java.util.TreeMap;
@@ -14,8 +16,70 @@ public class Main {
 
 	public static void main(String[] args) {
 		//booleanEngine();
-		vectorialEngine();
+		//vectorialEngine(); 
+		probabilisticEngine();
+	}
+	
+
+	
+	public static void probabilisticEngine() {
+		Scanner saisie = new Scanner(System.in);
+		System.out.println("Que souhaitez-vous rechercher ?");
+		String query = saisie.nextLine();
+		String[]tabQuery = query.split(" ");
 		
+		//initializing the list
+		
+		ArrayList<String>listQuery = new ArrayList<String>();
+		for(String s : tabQuery) {
+			listQuery.add(s);
+		}
+		
+		//removing all stopWords
+		
+		clearQuery(listQuery);
+		
+		
+		Index index = new Index();
+		index.loadVocabulary();
+		index.loadDocuments();
+		
+		HashMap<Integer,Double> resultat = new HashMap<Integer,Double>();
+        System.out.println("taille de résultat = " + resultat.size());
+
+        for(int i = 0; i < listQuery.size(); i++) {
+                
+            Keyword k;
+            TreeMap<Integer,Double> freq;
+            
+            k = index.getKeyword(listQuery.get(i));
+            
+           if(k != null) {
+
+               freq = k.getFrequences();
+               
+               System.out.println("taille freq = " + freq.size());
+              // HashMap<Integer,Double> resultatTmp = new HashMap<Integer,Double>();
+               
+               for(Integer idDoc : freq.keySet()) {
+               	resultat.put(idDoc, freq.get(idDoc));
+               }
+                  
+                     
+               //resultat = resultatTmp;
+               System.out.println("nouvelle taille resultat = " + resultat.size()+ "\n");
+           }
+           else {
+        	   System.out.println("mot introuvable");
+           }
+            
+            
+
+       }
+
+        ajoutParPertinence(index, resultat, listQuery, 0.99);
+        //vectorialEngine(listQuery);	//penser à retirer le commentaire après les tests
+        
 	}
 	
 	public static void vectorialEngine() {
@@ -41,41 +105,29 @@ public class Main {
 		index.loadDocuments();
 		
 		HashMap<Integer,Double> resultat = new HashMap<Integer,Double>();
-        Keyword k1 = index.getKeyword(listQuery.get(0));
         System.out.println("taille de résultat = " + resultat.size());
 
         for(int i = 0; i < listQuery.size(); i++) {
-//            k1 = index.getKeyword(listQuery.get(i));
-//            TreeMap<Integer,Double> freq1;
-//            freq1 = k1.getFrequences();
-        	
                 
-            if(i == 0 && (k1 != null)) {
-                TreeMap<Integer,Double> freq1 = k1.getFrequences();
-            	for(Integer id : freq1.keySet()) {
-                    resultat.put(id, freq1.get(id));
-                }
-            }
-                
-            Keyword k2;
-            TreeMap<Integer,Double> freq2;
+            Keyword k;
+            TreeMap<Integer,Double> freq;
             
-            k2 = index.getKeyword(listQuery.get(i));
+            k = index.getKeyword(listQuery.get(i));
             
-           if(k2 != null) {
+           if(k != null) {
 
-               freq2 = k2.getFrequences();
+               freq = k.getFrequences();
                
-               System.out.println("taille freq2 = " + freq2.size());
-               HashMap<Integer,Double> resultatTmp = new HashMap<Integer,Double>();
+               System.out.println("taille freq = " + freq.size());
+              // HashMap<Integer,Double> resultatTmp = new HashMap<Integer,Double>();
                
-               for(Integer idDoc : freq2.keySet()) {
-               	resultat.put(idDoc, freq2.get(idDoc));
+               for(Integer idDoc : freq.keySet()) {
+               	resultat.put(idDoc, freq.get(idDoc));
                }
                   
                      
                //resultat = resultatTmp;
-               System.out.println("nouvelle taille resultat = " + resultat.size());
+               System.out.println("nouvelle taille resultat = " + resultat.size()+ "\n");
            }
            else {
         	   System.out.println("mot introuvable");
@@ -83,13 +135,73 @@ public class Main {
             
             
 
+       }
+       //code calcul ici
+        TreeMap<Integer,Double> associationDocumentsPoids = calculPoidsClassementVectoriel(resultat, index, listQuery);
+        for(Integer id : associationDocumentsPoids.keySet()) {
+        	Document d = index.getDocument(id);
+        	//System.out.println(id + "   " + associationDocumentsPoids.get(id));
         }
-       
-            	
-            
         
+            	
+         saisie.close();      
 	}
 	
+	//------------------------------------------------------------------------------------------------------------------------------------------------
+	
+	public static void vectorialEngine(ArrayList<String>listQuery) {
+	
+		
+		clearQuery(listQuery);
+		
+		
+		Index index = new Index();
+		index.loadVocabulary();
+		index.loadDocuments();
+		
+		HashMap<Integer,Double> resultat = new HashMap<Integer,Double>();
+        System.out.println("taille de résultat = " + resultat.size());
+
+        for(int i = 0; i < listQuery.size(); i++) {
+                
+            Keyword k;
+            TreeMap<Integer,Double> freq;
+            
+            k = index.getKeyword(listQuery.get(i));
+            
+           if(k != null) {
+
+               freq = k.getFrequences();
+               
+               System.out.println("taille freq = " + freq.size());
+              // HashMap<Integer,Double> resultatTmp = new HashMap<Integer,Double>();
+               
+               for(Integer idDoc : freq.keySet()) {
+               	resultat.put(idDoc, freq.get(idDoc));
+               }
+                  
+                     
+               //resultat = resultatTmp;
+               System.out.println("nouvelle taille resultat = " + resultat.size()+ "\n");
+           }
+           else {
+        	   System.out.println("mot introuvable");
+           }
+            
+            
+
+       }
+       //code calcul ici
+        TreeMap<Integer,Double> associationDocumentsPoids = calculPoidsClassementVectoriel(resultat, index, listQuery);
+        for(Integer id : associationDocumentsPoids.keySet()) {
+        	Document d = index.getDocument(id);
+        	//System.out.println(id + "   " + associationDocumentsPoids.get(id));
+        }
+        
+            	
+	}
+	
+
 	
 	
 	// ------------------------------------------------------------------------------------------------------------
@@ -240,5 +352,85 @@ public class Main {
 			e.printStackTrace();
 		}
 	}
+	
+	public static TreeMap<Integer,Double> calculPoidsClassementVectoriel(HashMap<Integer,Double> resultat, Index index, ArrayList<String>listQuery) {
+		TreeMap<Integer,Double> associationDocumentsPoids = new TreeMap<Integer,Double>();
+		
+		for(Integer idDoc : resultat.keySet()) {
+			Document doc = index.getDocument(idDoc);
+			TreeMap<String,Double> associationMotsFreq = doc.getFrequences();
+			
+			double num = 0, denoGauche = 0, denoDroit = 0;
+
+			for(String mot : associationMotsFreq.keySet()) {
+				if(listQuery.contains(mot)) {
+					double freqMotRequete = (double)(Collections.frequency(listQuery, mot)/(double)listQuery.size());
+					
+					//debut calcul
+					
+					num += freqMotRequete *  associationMotsFreq.get(mot);
+					denoGauche += Math.pow(associationMotsFreq.get(mot), 2);
+					denoDroit += Math.pow(freqMotRequete, 2);
+					
+					//System.out.println(freqMotRequete + " " + associationMotsFreq.get(mot));
+					//System.out.println("\n\n" + denoGauche + " " + denoDroit+ " " + num);
+
+
+				}
+			}
+			
+			double ValClassement = num/(Math.sqrt(denoGauche) * Math.sqrt(denoDroit));
+			System.out.println(ValClassement);
+			//System.out.println(Math.sqrt(denoGauche));
+			//System.out.println(Math.sqrt(denoDroit));
+			associationDocumentsPoids.put(idDoc, ValClassement);
+			
+			//break;
+		}
+		return associationDocumentsPoids;
+	}
+	
+	public static void ajoutParPertinence(Index index, HashMap<Integer,Double> resultat, ArrayList<String>listQuery, double seuil) {
+		double N = index.documents.size();
+		double R = resultat.size();
+		
+//		System.out.println("taille de N = " + N);
+//		System.out.println("taille de R = " + R);
+		
+		
+		
+		for(Integer idDoc : resultat.keySet()) {
+			Document doc = index.getDocument(idDoc);
+			
+			for(String mot : doc.getFrequences().keySet()) {
+				double n = (double)index.getKeyword(mot).getFrequences().keySet().size();
+				double r = 0;
+				
+				for(Integer id : resultat.keySet()) {
+					Document doc2 = index.getDocument(id);
+					if(doc2.getFrequences().containsKey(mot)) {
+						r++;
+					}
+				}
+//				System.out.println(N);
+//				System.out.println(R);
+				
+
+				double valPertinence = Math.log10((r/(R-r))/((n-r)/(N-n-R+r))) * Math.abs((r-R)-(n-r)/(N-R));
+				
+				
+				if(valPertinence >= seuil) {
+					System.out.println("Nouveau mot ajouté: " + mot);
+					System.out.println("Valeur de N = " + N);
+					System.out.println("Valeur de n = " + n);
+					System.out.println("Valeur de R = " + R);
+					System.out.println("Valeur de r = " + r);
+					System.out.println("Valeur de pertinence = " + valPertinence + "\n\n");
+					listQuery.add(mot);
+				}
+			}
+		}
+	}
+
 	
 }
