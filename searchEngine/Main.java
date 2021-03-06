@@ -20,8 +20,8 @@ public class Main {
 
 	public static void main(String[] args) {
 		//booleanEngine();
-		vectorialEngine(); 
-		//probabilisticEngine();
+		//vectorialEngine(); 
+		probabilisticEngine();
 	}
 	
 
@@ -144,7 +144,7 @@ public class Main {
         TreeMap<Integer,Double> associationDocumentsPoids = calculPoidsClassementVectoriel(resultat, index, listQuery);
         for(Integer id : associationDocumentsPoids.keySet()) {
         	Document d = index.getDocument(id);
-        	//System.out.println(id + "   " + associationDocumentsPoids.get(id));
+        	System.out.println(d.getTitle());
         }
         
             	
@@ -199,7 +199,7 @@ public class Main {
         TreeMap<Integer,Double> associationDocumentsPoids = calculPoidsClassementVectoriel(resultat, index, listQuery);
         for(Integer id : associationDocumentsPoids.keySet()) {
         	Document d = index.getDocument(id);
-        	//System.out.println(id + "   " + associationDocumentsPoids.get(id));
+        	System.out.println(d.getTitle());
         }
         
             	
@@ -361,35 +361,44 @@ public class Main {
 		TreeMap<Integer,Double> associationDocumentsPoids = new TreeMap<Integer,Double>();
 		
 		for(Integer idDoc : resultat.keySet()) {
-			Document doc = index.getDocument(idDoc);
-			TreeMap<String,Double> associationMotsFreq = doc.getFrequences();
+				
 			
-			double num = 0, denoGauche = 0, denoDroit = 0;
-
-			for(String mot : associationMotsFreq.keySet()) {
-				if(listQuery.contains(mot)) {
-					double freqMotRequete = (double)(Collections.frequency(listQuery, mot)/(double)listQuery.size());
-					
-					//debut calcul
-					
-					num += freqMotRequete *  associationMotsFreq.get(mot);
-					denoGauche += Math.pow(associationMotsFreq.get(mot), 2);
-					denoDroit += Math.pow(freqMotRequete, 2);
-					
-					//System.out.println(freqMotRequete + " " + associationMotsFreq.get(mot));
-					//System.out.println("\n\n" + denoGauche + " " + denoDroit+ " " + num);
-
-
+				Document doc = index.getDocument(idDoc);
+				TreeMap<String,Double> associationMotsFreq = doc.getFrequences();
+				
+				double num = 0, denoGauche = 0, denoDroit = 0;
+	
+				for(String mot : associationMotsFreq.keySet()) {
+					if(listQuery.contains(mot)) {
+						System.out.println("mot = " + mot);
+						
+						double freqMotRequete = (double)(Collections.frequency(listQuery, mot)/(double)listQuery.size());
+						
+						//debut calcul
+						
+						num += freqMotRequete *  associationMotsFreq.get(mot);
+						denoGauche += Math.pow(associationMotsFreq.get(mot), 2);
+						denoDroit += Math.pow(freqMotRequete, 2);
+						
+//						System.out.println("denoGauche = " + denoGauche);
+//						System.out.println("denoDroit = " + denoDroit);
+//						System.out.println("num = " + num);
+						//System.out.println(freqMotRequete + " " + associationMotsFreq.get(mot));
+						//System.out.println("\n\n" + denoGauche + " " + denoDroit+ " " + num);
+	
+	
+					}
 				}
-			}
+				
+				double ValClassement = num/(Math.sqrt(denoGauche) * Math.sqrt(denoDroit));
+				System.out.println("classement = " + ValClassement);
+				//System.out.println(ValClassement);
+				//System.out.println(Math.sqrt(denoGauche));
+				//System.out.println(Math.sqrt(denoDroit));
+				associationDocumentsPoids.put(idDoc, ValClassement);
+				
+				//break;
 			
-			double ValClassement = num/(Math.sqrt(denoGauche) * Math.sqrt(denoDroit));
-			System.out.println(ValClassement);
-			//System.out.println(Math.sqrt(denoGauche));
-			//System.out.println(Math.sqrt(denoDroit));
-			associationDocumentsPoids.put(idDoc, ValClassement);
-			
-			//break;
 		}
 		return associationDocumentsPoids;
 	}
@@ -476,7 +485,7 @@ public class Main {
 				        maxEntry = entry;
 				    }
 				}
-				System.out.println(maxEntry.getKey());
+				System.out.println("mot ajouté = " + maxEntry.getKey());
 				listQuery.add(maxEntry.getKey());
 		
 
